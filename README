@@ -15,6 +15,33 @@ The routines take the following parameters:
 		alpha -- Starting alpha transparency
 		decay -- rate at which branches turn transparent
 		
-		
-As an example, the following script randomly calls one of the routines and places it in a canvas object: 
 
+The file evolving_sketches.html demonstrates the functionality. The key routine in that file is the following script, which randomly calls one of the routines and places it in a canvas object with the id of "canvas". 
+
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+
+	<script type="text/javascript">
+		jQuery(document).ready( function () {
+			
+			var canvas = jQuery('#canvas')[0] || {};
+			if (canvas) { 
+				var context = canvas.getContext('2d');
+				var callDrawVines = function () {
+					// Draw vines starting at 300, 300, with a starting angle of -90
+					// and a depth of 7.
+					DRAWING.drawVines(context, {'x': 300, 'y': 300}, -90, 7);
+				}, 
+					callDrawTree = function () {
+					// Draw tree starting at 300, 300, with a total energy of 40. 
+					DRAWING.drawTree(context, {'x': 300, 'y': 300}, 40);		
+				},
+				options = [callDrawVines, callDrawTree],
+				choice = UTILITIES.getRandomInt(0, options.length - 1); 
+				
+				console.log(choice); 
+				
+				// Call choice
+				options[choice](); 	
+			}
+		}); // End jQuery(document).ready
+	</script>
