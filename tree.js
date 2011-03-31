@@ -260,8 +260,13 @@ DRAWING.drawTree = function (ctxt, start, totalEnergy) {
 	var initialBranch =  DRAWING.getChildBranches(start, totalEnergy),
 		nextBranches = initialBranch; //[initialBranch[0]];
 
+	// Draw trunk
 	ctxt.save()
 	ctxt.beginPath();
+	ctxt.shadowColor = 'rgba(50, 50, 50, .4)'; 
+	ctxt.shadowOffsetX = 8;
+	ctxt.shadowOffsetY = 8;	
+	ctxt.shadowBlur = 5; 
 	ctxt.moveTo(start['x'], start['y'] + totalEnergy * 4);
 	ctxt.lineWidth = totalEnergy / 4; 
 	ctxt.lineTo(start['x'], start['y']); 

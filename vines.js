@@ -372,7 +372,8 @@ DRAWING.drawBranch = function (params) {
  * @param {Number} alpha
  * @param {Number} decay
  */
-DRAWING.root = function (ctxt, x, y, angle, depth, alpha, decay) {    
+DRAWING.drawVines = function (ctxt, start, angle, depth, alpha, decay) {    
+	start = start || {'x': 300, 'y': 300}; 
     angle = angle || 0;
     depth = depth || 5;
     alpha = alpha || 1.0;
@@ -382,8 +383,8 @@ DRAWING.root = function (ctxt, x, y, angle, depth, alpha, decay) {
 		randomDepth = depth * UTILITIES.getRandomInt(10,20),
 		currentBranch, 
 		nextBranches = [{
-			'x': x, 
-			'y': y, 
+			'x': start['x'], 
+			'y': start['y'], 
 			'angle': angle, 
 			'depth': depth, 
 			'alpha': alpha 

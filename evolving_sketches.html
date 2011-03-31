@@ -1,0 +1,62 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<head>
+		<title>Evolving Sketches</title>
+		<link rel="stylesheet" href="" 
+			type="text/css" media="screen" charset="utf-8"/>
+		
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+		<script type="text/javascript" src="utilities.js"></script>		
+		<script type="text/javascript" src="vines.js"></script>
+		<script type="text/javascript" src="tree.js"></script>
+	</head>
+
+<body>
+	<script type="text/javascript">
+		jQuery(document).ready( function () {
+			
+			var canvas = jQuery('#canvas')[0] || {};
+			if (canvas) { 
+				var context = canvas.getContext('2d');
+				var callDrawVines = function () {
+					// Draw vines starting at 300, 300, with a starting angle of -90
+					// and a depth of 7.
+					DRAWING.drawVines(context, {'x': 300, 'y': 300}, -90, 7);
+				}, 
+					callDrawTree = function () {
+					// Draw tree starting at 300, 300, with a total energy of 40. 
+					DRAWING.drawTree(context, {'x': 300, 'y': 300}, 40);		
+				},
+				options = [callDrawVines, callDrawTree],
+				choice = UTILITIES.getRandomInt(0, options.length - 1); 
+				
+				console.log(choice); 
+				
+				// Call choice
+				options[choice](); 	
+			}
+		}); // End jQuery(document).ready
+	</script>
+
+	<div id="header">
+		<h1>Evolving Sketches</h1>
+	</div>
+	
+	<div id="mainContentContainer">
+		
+		<div id="aboutContainer">
+			Reload to see either growing vines or growing trees.
+		</div>
+
+		<div id="graphicContainer">
+				<canvas id="canvas" width="600" height="400"></canvas>
+		</div>
+					
+	</div>
+
+</body>
