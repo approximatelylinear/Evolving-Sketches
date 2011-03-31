@@ -1,0 +1,20 @@
+The main routines for tree.js and vines.js are, respectively, DRAWING.drawTree() and DRAWING.drawVines(). 
+
+The routines take the following parameters: 
+
+	DRAWING.drawTree()
+		context -- HTML Canvas 2D context
+		start -- Object of the form {'x': NUMBER, 'y': NUMBER}
+		totalEnergy -- The amount of energy for growing available to the whole tree.	
+			
+	DRAWING.drawVines()
+		context -- HTML Canvas 2D context
+		start -- Object of the form {'x': NUMBER, 'y': NUMBER}
+		angle -- Direction of growth of initial branch
+		depth -- Distance to grow (also affects the width of the branches)
+		alpha -- Starting alpha transparency
+		decay -- rate at which branches turn transparent
+		
+		
+As an example, the following script randomly calls one of the routines and places it in a canvas object: 
+
