@@ -206,7 +206,11 @@ DRAWING.drawBranches = function (ctxt, branch) {
 
 	// Draw lines 1/10 thick as they are long.
 	ctxt.lineWidth = energy/10; 
-		
+	ctxt.shadowColor = 'rgba(50, 50, 50, .4)'; 
+	ctxt.shadowOffsetX = 8;
+	ctxt.shadowOffsetY = 8;	
+	ctxt.shadowBlur = 5; 
+			
 	// draw branches	
 	ctxt.beginPath();
 	

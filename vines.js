@@ -18,6 +18,46 @@ DRAWING.drawLeaf = function (ctxt, currentBranch) {
 	} 
 }; 
 
+
+
+/**
+ * @methodOf DRAWING
+ * @param {Object} styleObject 
+ * @param {String} styleType 
+*/
+DRAWING.getColorString = function (styleObject, styleType) {
+	var colorString; 
+	if (styleObject[styleType]) {
+		colorString = 'rgba(' + styleObject[styleType]['red'] + '%,' + 
+			styleObject[styleType]['green'] + '%,' + 
+			styleObject[styleType]['blue'] + '%,' +
+			styleObject[styleType]['alpha'] + ')'
+	}
+	else { colorString = 'rgb(50%, 50%, 50%, .5)'};
+	return colorString; 
+};
+
+
+DRAWING.getGeometricObject = function (positionParam, positionParamType, ctxt) {
+	var geomObj = {
+		'arc': function () {
+				ctxt.arc(positionParam['x'], 
+						positionParam['y'], 
+						positionParam['radius'], 
+						positionParam['startAngle'], 
+						positionParam['endAngle'], 
+						positionParam['counterClockwise']);
+		},  
+		'line': function () {
+			ctxt.moveTo(positionParam['start']['x'], positionParam['start']['y']); 
+			ctxt.lineTo(positionParam['end']['x'], positionParam['end']['y']);
+		}
+	}
+	console.log(geomObj[positionParamType]);
+	return geomObj[positionParamType]; 
+}; 
+	
+		
 /**
  * @param {Object} ctxt The 2d context of the HTML5 canvas object.
  * @param {Object} styleParam 
@@ -50,52 +90,37 @@ DRAWING.drawLeafLayer = function (ctxt, styleParam, positionParam) {
 	//ctxt.beginPath(); 
 	ctxt.save();
 	
-	var currentColorString; 
-			
-	// Determine canvas strokeStyle
-	if (styleParam['strokeStyle']) {
-		currentColorString = 'rgba(' + styleParam['strokeStyle']['red'] + '%,' + 
-			styleParam['strokeStyle']['green'] + '%,' + 
-			styleParam['strokeStyle']['blue'] + '%,' +
-			styleParam['strokeStyle']['alpha'] + ')';  
-		ctxt.strokeStyle = currentColorString;
-	}
-	
-	// Determine canvas fillStyle
-	if (styleParam['fillStyle']) {
-		currentColorString = 'rgba(' + styleParam['fillStyle']['red'] + '%,' + 
-			styleParam['fillStyle']['green'] + '%,' + 
-			styleParam['fillStyle']['blue'] + '%,' +
-			styleParam['fillStyle']['alpha'] + ')';   
-		ctxt.fillStyle = currentColorString;
-	}
-	
-	
-	// Determine canvas lineWidth
-	if (styleParam['lineWidth']) {
-		ctxt.lineWidth = styleParam['lineWidth']; 
-	}
-	
-	// Finetune drawing method for drawing an arc, if appropriate
-	if (positionParam['type'] === 'arc'){
-		ctxt.arc(positionParam['x'], 
-				positionParam['y'], 
-				positionParam['radius'], 
-				positionParam['startAngle'], 
-				positionParam['endAngle'], 
-				positionParam['counterClockwise']);
-	}
+	var strokeColor = DRAWING.getColorString(styleParam, 'strokeStyle') ||
+		'rgb(50%, 50%, 50%, .5)',  
+		fillColor = DRAWING.getColorString(styleParam, 'fillStyle') ||
+		'rgb(50%, 50%, 50%, .5)',
+		shadowColor = DRAWING.getColorString(styleParam, 'shadowColor') ||
+		'rgb(50%, 50%, 50%, 0)',
+		shadowOffsetX = styleParam['shadowOffsetX'] || 0, 
+		shadowOffsetY = styleParam['shadowOffsetY'] || 0,
+		shadowBlur = styleParam['shadowBlur'] || 0,
+		lineWidth = styleParam['lineWidth'] || 1; 
+		
+	ctxt.strokeStyle = strokeColor; 
+	ctxt.fillStyle = fillColor; 
+	ctxt.shadowColor = shadowColor; 
+	ctxt.shadowOffsetX = shadowOffsetX;
+	ctxt.shadowOffsetY = shadowOffsetY;	
+	ctxt.shadowBlur = shadowBlur; 
+	ctxt.lineWidth = lineWidth; 
 
-	// Finetune drawing method for drawing a line, if appropriate
-	if (positionParam['type'] === 'line'){
-		ctxt.moveTo(positionParam['start']['x'], positionParam['start']['y']); 
-		ctxt.lineTo(positionParam['end']['x'], positionParam['end']['y']); 
-	}
+	// Determine shapes
+	var shapeFnc = DRAWING.getGeometricObject(positionParam, positionParam['type'], ctxt); 
 
+	shapeFnc.apply(null);  
+	
+	// Draw shapes
 	ctxt.stroke(); 
 	ctxt.fill(); 
 	ctxt.restore();
-}; 
+};
+
+
 
 /**
  * @methodOf DRAWING
@@ -117,35 +142,24 @@ DRAWING.setLeafStyle = function (currentBranch) {
 		dx = currentBranch['dx'], 
 		dy = currentBranch['dy'];
 		
-	// Oval dropshadow
-	var shadowStyleParam = {
-		'fillStyle': {
-			'red': 0.0, 
-			'green': 0.0,
-			'blue': 0.0, 
-			'alpha': currentBranch['alpha'] * 0.25
-		}
-	}; 
-
-	var shadowPositionParam = {
-		'type': 'arc', 
-		'x': currentBranch['x'] - w/6 + currentBranch['depth'], 
-		'y': currentBranch['y'] - w/6 + currentBranch['depth'], 
-		'radius': w/3, 
-		'startAngle': 0, 
-		'endAngle': Math.PI * 2, 
-		'counterClockwise': true
-	}; 
-
 	// Line between leaves
 	var branchStyleParam = {
 		'strokeStyle': {
-			'red': 80 - (v * 0.25), 
-			'green': 80,
-			'blue': 80, 
+			'red': 80 - v * 8, 
+			'green': 40,
+			'blue': 80 + v * 8, 
 			'alpha': currentBranch['alpha']
 		}, 
 		'lineWidth': (currentBranch['depth'] + 1) * 0.5, 
+		'shadowBlur': 5,
+		'shadowColor': {
+			'red': 40, 
+			'green': 40,
+			'blue': 40, 
+			'alpha': .4
+		},
+		'shadowOffsetX': 8, 
+		'shadowOffsetY': 8, 		 
 	}; 
 	 
 	var branchPositionParam = {
@@ -163,12 +177,21 @@ DRAWING.setLeafStyle = function (currentBranch) {
 	// Colored oval.
 	var colorStyleParam = {
 		'fillStyle': {
-			'red': 80 - (v * 0.25), 
-			'green': 80,
-			'blue': 80 - v, 
+			'red': 80 + v * 8, 
+			'green': 80 - v * 8,
+			'blue': 80, 
 			'alpha': currentBranch['alpha'] * 0.5
 		}, 
-		'lineWidth': (currentBranch['depth'] + 1) * 0.25
+		'lineWidth': (currentBranch['depth'] + 1) * 0.25, 
+		'shadowColor': {
+			'red': 40, 
+			'green': 40,
+			'blue': 40, 
+			'alpha': .4
+		},
+		'shadowBlur': 5,
+		'shadowOffsetX': 8, 
+		'shadowOffsetY': 8, 
 	}; 
 
 	var colorPositionParam = {
@@ -183,12 +206,10 @@ DRAWING.setLeafStyle = function (currentBranch) {
 
 	return {
 		'styleParams': [
-			shadowStyleParam, 
 			branchStyleParam, 
 			colorStyleParam
 		],	
 		'positionParams': [
-			shadowPositionParam, 
 			branchPositionParam, 
 			colorPositionParam
 		]
@@ -240,7 +261,7 @@ DRAWING.setupBranch = function (params) {
 		randomDepth = params['randomDepth'], 
 		alpha = params['alpha'],
 		decay = params['decay'], 
-		angle = params['angle'], 
+		//angle = params['angle'], 
 		i = 0, 
 		drawingQueue = [];
 
@@ -257,7 +278,7 @@ DRAWING.setupBranch = function (params) {
 			// Determine the next direction to grow in.
 			// This is between -60 and 60 degrees of the current bearing.
 							
-			currentBranch['angle'] += UTILITIES.getRandomInt(-90, 90);
+			currentBranch['angle'] += UTILITIES.getRandomInt(-60, 60);
 			var dx = currentBranch['x'] + Math.cos(Math.PI/180 * currentBranch['angle']) * w;
 			var dy = currentBranch['y'] + Math.sin(Math.PI/180 * currentBranch['angle']) * w;
 
@@ -357,7 +378,7 @@ DRAWING.root = function (ctxt, x, y, angle, depth, alpha, decay) {
     alpha = alpha || 1.0;
     decay = decay || 0.005;
     
-    var w = depth*6, 
+    var w = depth*2, 
 		randomDepth = depth * UTILITIES.getRandomInt(10,20),
 		currentBranch, 
 		nextBranches = [{
