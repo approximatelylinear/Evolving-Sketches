@@ -14,7 +14,6 @@ The routines take the following parameters:
 		depth -- Distance to grow (also affects the width of the branches)
 		alpha -- Starting alpha transparency
 		decay -- rate at which branches turn transparent
-		
 
 The file evolving_sketches.html demonstrates the functionality. The key routine in that file is the following script, which randomly calls one of the routines and places it in a canvas object with the id of "canvas". 
 
